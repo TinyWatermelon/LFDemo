@@ -16,9 +16,9 @@ namespace HelloMicrosoft.Models
     class LostAndFoundPageModel
     {
         string[] catalog = { "", "一卡通", "钱包", "钥匙", "电子产品", "雨伞", "衣物", "其他" };
-        public async Task<LostAndFoundPageViewMode> LoadItems(string uri, int cat = 0)
+        public async Task<LostAndFoundPageViewModel> LoadItems(string uri, int cat = 0)
         {
-            LostAndFoundPageViewMode LFPVM = new LostAndFoundPageViewMode();
+            LostAndFoundPageViewModel LFPVM = new LostAndFoundPageViewModel();
             string content;
             content = await GetJson(uri + catalog[cat]);
             if(content!= "NetworkError")
@@ -72,10 +72,10 @@ namespace HelloMicrosoft.Models
             }
             return content;
         }
-        protected LostAndFoundPageViewMode JsonToObject(string Json)
+        protected LostAndFoundPageViewModel JsonToObject(string Json)
         {
             //var lostAndFoundPageViewMode = new LostAndFoundPageViewMode();
-            var lostAndFoundPageViewMode = JsonConvert.DeserializeObject<LostAndFoundPageViewMode>(Json);
+            var lostAndFoundPageViewMode = JsonConvert.DeserializeObject<LostAndFoundPageViewModel>(Json);
             return lostAndFoundPageViewMode;
         }
     }

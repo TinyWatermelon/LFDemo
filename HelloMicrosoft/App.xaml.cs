@@ -7,6 +7,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -40,12 +41,28 @@ namespace HelloMicrosoft
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
 #if DEBUG
+            Frame rootFrame = Window.Current.Content as Frame;
+            if (rootFrame == null)
+            {
+                rootFrame = new Frame();
+                rootFrame.NavigationFailed += OnNavigationFailed;
+                //加上这句订阅Frame的导航事件
+                rootFrame.Navigated += OnNavigated;
+                if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
+                {
+
+                }
+                Window.Current.Content = rootFrame;
+                //加上下面两句，订阅返回事件
+                SystemNavigationManager.GetForCurrentView().BackRequested += OnBackrequested;
+                SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = rootFrame.CanGoBack ? AppViewBackButtonVisibility.Visible : AppViewBackButtonVisibility.Collapsed;
+            }
             if (System.Diagnostics.Debugger.IsAttached)
             {
                 this.DebugSettings.EnableFrameRateCounter = true;
             }
 #endif
-            Frame rootFrame = Window.Current.Content as Frame;
+            //Frame rootFrame = Window.Current.Content as Frame;
 
             // Do not repeat app initialization when the Window already has content,
             // just ensure that the window is active
@@ -88,14 +105,27 @@ namespace HelloMicrosoft
         {
             throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
         }
-
+        private void OnNavigated(object sender, NavigationEventArgs e)
+        {
+            //根据页面是否可以返回，在窗口显示返回按钮
+            SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = ((Frame)sender).CanGoBack ? AppViewBackButtonVisibility.Visible : AppViewBackButtonVisibility.Collapsed;
+        }
+        private void OnBackrequested(object sender, BackRequestedEventArgs e)
+        {
+            Frame rootFrame = Window.Current.Content as Frame;
+            if (rootFrame != null && rootFrame.CanGoBack)
+            {
+                e.Handled = true;//这句一定要有，不然还会发生默认返回键操作
+                rootFrame.GoBack();
+            }
+        }
         /// <summary>
-        /// Invoked when application execution is being suspended.  Application state is saved
+        /// Invoked when application execution is being suspended.Application state is saved
         /// without knowing whether the application will be terminated or resumed with the contents
         /// of memory still intact.
         /// </summary>
-        /// <param name="sender">The source of the suspend request.</param>
-        /// <param name="e">Details about the suspend request.</param>
+        /// <param name = "sender" > The source of the suspend request.</param>
+        /// <param name = "e" > Details about the suspend request.</param>
         private void OnSuspending(object sender, SuspendingEventArgs e)
         {
             var deferral = e.SuspendingOperation.GetDeferral();

@@ -11,32 +11,10 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace HelloMicrosoft.ViewModel
 {
-    class LostAndFoundPageViewMode
+    class LostAndFoundPageViewModel
     {
         public string next_page_url { get; set; }
         public ObservableCollection<LFItem> data = new ObservableCollection<LFItem>();
-        //public ObservableCollection<LFItem> Data
-        //{
-        //    get
-        //    {
-        //        return data;
-        //    }
-        //    set
-        //    {
-        //        this.data = value;
-        //        OnPropertyChanged("Data");
-        //    }
-        //}
-        //protected void OnPropertyChanged(string propertyName)
-        //{
-        //    if (this.PropertyChanged != null)
-        //    {
-        //        PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-
-        //    }
-        //}
-
-        //public event PropertyChangedEventHandler PropertyChanged;
     }
     class LFItem
     {

@@ -31,7 +31,7 @@ namespace HelloMicrosoft
     {
         APPTheme AppTheme=new APPTheme();
         LostAndFoundPageModel Model=new LostAndFoundPageModel();
-        LostAndFoundPageViewMode[] VM=new LostAndFoundPageViewMode[8];//
+        LostAndFoundPageViewModel[] VM=new LostAndFoundPageViewModel[8];//
         bool[] IsItemLoaded = { false, false, false, false, false, false, false, false };
         ObservableCollection<bool> IsProgressRingActive = new ObservableCollection<bool>();
         string Title;
@@ -41,9 +41,11 @@ namespace HelloMicrosoft
             for(byte i=0;i<8;i++)
             {
                 IsProgressRingActive.Add(true);
-                VM[i] = new LostAndFoundPageViewMode();
+                VM[i] = new LostAndFoundPageViewModel();
             }
             this.InitializeComponent();
+            NavigationCacheMode = NavigationCacheMode.Enabled;      //页面缓存,页面返回时仅调用OnNavigatedTo方法
+
         }
 
         private void LostAndFoundPageAddAppBarButton_Click(object sender, RoutedEventArgs e)
@@ -58,7 +60,7 @@ namespace HelloMicrosoft
             {
                 IsProgressRingActive[index] = true;
                 VM[index].data.Clear();
-                LostAndFoundPageViewMode temp = await Model.LoadItems(BaseUrl, index);
+                LostAndFoundPageViewModel temp = await Model.LoadItems(BaseUrl, index);
                 foreach (LFItem i in temp.data)
                 {
                     VM[index].data.Add(i);
@@ -85,7 +87,7 @@ namespace HelloMicrosoft
                     }
                     else
                     {
-                        LostAndFoundPageViewMode temp = await Model.LoadItems(VM[index].next_page_url);
+                        LostAndFoundPageViewModel temp = await Model.LoadItems(VM[index].next_page_url);
                         foreach (LFItem i in temp.data)
                         {
                             VM[index].data.Add(i);
@@ -103,17 +105,25 @@ namespace HelloMicrosoft
         }
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            var but = e.Parameter as Button;
-            if (but.Name == "ChooseLostPageBut")
+            if(!IsItemLoaded[0])
             {
-                BaseUrl = "http://hongyan.cqupt.edu.cn/laf/api/view/lost/";
-                Title = "寻物启事";
+                var but = e.Parameter as Button;
+                if (but.Name == "ChooseLostPageBut")
+                {
+                    BaseUrl = "http://hongyan.cqupt.edu.cn/laf/api/view/lost/";
+                    Title = "寻物启事";
+                }
+                else
+                {
+                    BaseUrl = "http://hongyan.cqupt.edu.cn/laf/api/view/found/";
+                    Title = "失物招领";
+                }
             }
-            else
-            {
-                BaseUrl = "http://hongyan.cqupt.edu.cn/laf/api/view/found/";
-                Title = "失物招领";
-            }
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            base.OnNavigatedFrom(e);
         }
 
         private async void LostAndFoundPagePivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -121,7 +131,7 @@ namespace HelloMicrosoft
             int index = LostAndFoundPagePivot.SelectedIndex;
             if (!IsItemLoaded[index])
             {
-                LostAndFoundPageViewMode temp = await Model.LoadItems(BaseUrl, index);
+                LostAndFoundPageViewModel temp = await Model.LoadItems(BaseUrl, index);
                 foreach (LFItem i in temp.data)
                 {
                     VM[index].data.Add(i);
