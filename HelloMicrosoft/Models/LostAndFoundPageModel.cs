@@ -23,6 +23,8 @@ namespace HelloMicrosoft.Models
             content = await GetJson(uri + catalog[cat]);
             if(content!= "NetworkError")
             {
+                if(content=="")
+                    return LFPVM;
                 LFPVM = JsonToObject(content);
                 foreach (LFItem i in LFPVM.data)
                 {
